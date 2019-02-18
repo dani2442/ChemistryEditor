@@ -111,20 +111,26 @@ void AChemistLab::Move_Up(float AxisValue)
 
 void AChemistLab::Click()
 {
-	FVector Start = GetActorLocation();
-	FVector End = GetActorForwardVector() * 10000 + Start;
+	//FVector Start = GetActorLocation();
+	//FVector End = GetActorForwardVector() * 10000 + Start;
 
 	//GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, FString::Printf(TEXT("click!")));
 	FCollisionQueryParams CollisionParams;
 	//DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.1f, 0, 10);
 	FHitResult OutHit;
-	bool isHit = GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, CollisionParams);
+	FVector start;
+	FVector end;
+	OurPlayer->DeprojectMousePositionToWorld(start, end);
+	end *= 10000;
+	bool isHit = GetWorld()->LineTraceSingleByChannel(OutHit, start, end, ECC_Visibility, CollisionParams);
 
 	if (isHit) {
 		if (OutHit.bBlockingHit) {
 			if (GEngine) {
 				if (AComponent* getComponent = Cast<AComponent>(OutHit.GetActor())) {
+					element->components[selected]->OurVisibleActor->SetRenderCustomDepth(false);
 					selected = getComponent->position;
+					getComponent->OurVisibleActor->SetRenderCustomDepth(true);
 					//Layer = neuron->getLayer();
 					//Neuron = neuron->getNeuron();
 					GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Blue, FString::Printf(TEXT("selected: %i"),selected));
@@ -180,7 +186,7 @@ void AChemistLab::CreateTable() {
 		temp.AtomicNumber = 5;
 		temp.AtomicMass = 10.81;
 		temp.Radius = 80;
-		temp.Color = FColor::Green;
+		temp.Color = FColor(0,153,51);
 		temp.Name = "Boron";
 		PeriodicTable.Add(temp);
 	}
@@ -188,7 +194,7 @@ void AChemistLab::CreateTable() {
 		temp.AtomicNumber = 6;
 		temp.AtomicMass = 12;
 		temp.Radius = 77;
-		temp.Color = FColor::Cyan;
+		temp.Color = FColor(0,0,255);
 		temp.Name = "Carbon";
 		PeriodicTable.Add(temp);
 	}
@@ -196,7 +202,7 @@ void AChemistLab::CreateTable() {
 		temp.AtomicNumber = 7;
 		temp.AtomicMass = 14;
 		temp.Radius = 74;
-		temp.Color = FColor::Purple;
+		temp.Color = FColor(255,153,51);
 		temp.Name = "Nitrogen";
 		PeriodicTable.Add(temp);
 	}
@@ -204,7 +210,7 @@ void AChemistLab::CreateTable() {
 		temp.AtomicNumber = 8;
 		temp.AtomicMass = 16;
 		temp.Radius = 77;
-		temp.Color = FColor::Magenta;
+		temp.Color = FColor(0,153,204);
 		temp.Name = "Oxygen";
 		PeriodicTable.Add(temp);
 	}

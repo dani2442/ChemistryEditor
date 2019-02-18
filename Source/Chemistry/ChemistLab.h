@@ -52,7 +52,7 @@ public:
 	void SelectedElement(int32 n);
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-		int32 selElement = 5;
+		int32 selElement = 6;
 
 	UFUNCTION(BlueprintCallable, Category = "Chemistry")
 	void addElement(int32 type=1);

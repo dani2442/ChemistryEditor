@@ -54,6 +54,12 @@ AElement::AElement()
 	help.Add(FRotator(0, 180, 0));
 	help.Add(FRotator(0, 180, 0));
 	angles.Add(help);
+
+	//PSC = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("MyPSC"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> PS(TEXT("ParticleSystem'/Game/Assets/PS_Laser.PS_Laser'"));
+	PSC = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("MyPSC"));
+	PSC->SetTemplate(PS.Object);
+	//PSC->bHiddenInGame = true;
 }
 
 // Called when the game starts or when spawned
@@ -76,6 +82,7 @@ void AElement::Add(int attachId,Property& prop,int type) {
 	}
 	matrix.push_back(std::vector<int>(matrix[0].size()));
 	matrix[attachId].back() = type;
+	LaserParticles.Add(UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),PSC->Template, FTransform::Identity, false));
 
 	int newposition = matrix.size() - 1;
 	components.Add(GetWorld()->SpawnActorDeferred<AComponent>(AComponent::StaticClass(), FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
@@ -91,6 +98,7 @@ void AElement::Create(Property& prop) {
 	components[0]->position = 0;
 	components[0]->compProperty = prop;
 	components[0]->FinishSpawning(FTransform(FRotator::ZeroRotator, FVector::ZeroVector));
+	components[0]->OurVisibleActor->SetRenderCustomDepth(true);
 }
 
 void AElement::Delete()
@@ -104,15 +112,7 @@ void AElement::Delete()
 
 void AElement::Draw(float DeltaTime)
 {
-	for (int i = 0; i < matrix.size(); i++) {
-		for (int j = matrix.size()-1; j > i; j--) {
-			if(matrix[i][j]!=0)
-				DrawDebugLine(GetWorld(), components[i]->GetActorLocation(), components[j]->GetActorLocation(), FColor::Blue, false, DeltaTime+0.01, 0, 20);
-			//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),BeamParticle)
-			//ULineBatchComponent* LineBatcher;
-			//LineBatcher->DrawLine(components[i]->GetActorLocation(), components[j]->GetActorLocation(), FColor::Blue, false, 20, DeltaTime + 0.01);
-		}
-	}
+	
 }
 
 void AElement::Recalculate() {
@@ -128,6 +128,21 @@ void AElement::Recalculate() {
 			components[i]->SetActorRotation(newrotator);
 			RecalculateRecursive(i);
 			count2++;
+		}
+	}
+	int a = 0;
+	for (int i = 0; i < matrix.size(); i++) {
+		for (int j = matrix.size()-1; j > i; j--) {
+			if (matrix[i][j] != 0) {
+				LaserParticles[a]->SetBeamSourcePoint(0, components[i]->GetActorLocation(), 0);
+				LaserParticles[a]->SetBeamEndPoint(0, components[j]->GetActorLocation());
+				a++;
+				//DrawDebugLine(GetWorld(), components[i]->GetActorLocation(), components[j]->GetActorLocation(), FColor::Blue, false, DeltaTime+0.01, 0, 20);
+			}
+			
+			//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),BeamParticle)
+			//ULineBatchComponent* LineBatcher;
+			//LineBatcher->DrawLine(components[i]->GetActorLocation(), components[j]->GetActorLocation(), FColor::Blue, false, 20, DeltaTime + 0.01);
 		}
 	}
 }

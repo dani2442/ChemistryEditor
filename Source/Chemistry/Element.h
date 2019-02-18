@@ -6,6 +6,9 @@
 #include "Component.h"
 #include <vector>
 
+#include "ParticleHelper.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 #include "CoreMinimal.h"
@@ -31,6 +34,21 @@ public:
 
 	std::vector<std::vector<int>> matrix;
 	TArray<AComponent*> components;
+	TArray<UParticleSystemComponent*> LaserParticles;
+
+	//ConstructorHelpers::FObjectFinder<UParticleSystem> PS;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category = "AI Controller")
+		TSubclassOf<class UParticleSystem> comp1;
+
+	UPROPERTY(VisibleAnywhere)
+		class UParticleSystemComponent* PSC;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Controller")
+		//UParticleSystemComponent *comp2;
+
+	//UPROPERTY(EditDefaultsOnly)
+		//UParticleSystemComponent *comp3;
 
 	TArray<TArray<FRotator>> angles;
 
